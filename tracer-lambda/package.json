@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@aws-lambda-powertools/tracer": "^2.5.0"
+  }
+}
