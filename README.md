@@ -21,5 +21,6 @@ cdklocal deploy
 The output will include the names of the deployed functions, which you can test using `awslocal` (replacing `PowerToolsCdkStack-loggerFunction` with the outputted function name):
 
 ```bash
-awslocal lambda invoke --function-name PowerToolsCdkStack-loggerFunction -
+awslocal lambda invoke --function-name PowerTools-loggerFunction output.txt
 ```
+At this point, the logger function output can be seen in CloudWatch. The tracer function just runs. Updating these with better examples soon.
