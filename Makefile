@@ -8,8 +8,13 @@ install:        ## Install dependencies
 	cd logger-lambda && npm install
 	cd cdk && npm install
 
-deploy:         ## Deploy the app to LocalStack
-	cd cdk && \
+deploy-logger:         ## Deploy the app to LocalStack
+	cd logger-cdk && \
+	    cdklocal bootstrap && \
+	    cdklocal deploy --require-approval=never
+
+deploy-tracer:         ## Deploy the app to LocalStack
+	cd tracer-cdk && \
 	    cdklocal bootstrap && \
 	    cdklocal deploy --require-approval=never
 
@@ -17,7 +22,7 @@ deploy-cfn:     ## Deploy the generated CFn file to LocalStack
 	awslocal cloudformation create-stack --stack-name test-stack --template-body file://./cdk/template.transformed.yaml
 
 create-cfn-logger:     ## Create the self-contained CFn template for the logger function
-    make synth
+	make synth
     # TODO: names below still need to be replaced / properly extracted by the script:
 	utils/transform_template.py cdk/template.yaml loggerFunction1A496B16 cdk/cdk.out/.cache/3a099217b2db5213dc14e303b9b7c3b4a37b943738c18efd2129c8fc260dedc5.zip
 
