@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@aws-lambda-powertools/metrics": "^2.5.0"
+  }
+}
