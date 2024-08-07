@@ -1,13 +1,18 @@
-import { Metrics, MetricUnit } from '@aws-lambda-powertools/metrics';
+
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics';
+import { logMetrics } from '@aws-lambda-powertools/metrics/middleware';
+import middy from '@middy/core';
 
 const metrics = new Metrics({
-  namespace: 'LocalStack',
-  serviceName: 'metricExample',
+  namespace: 'localstackDemo',
+  serviceName: 'orders',
 });
 
-export const handler = async (
+const lambdaHandler = async (
   _event: unknown,
   _context: unknown
 ): Promise<void> => {
-  metrics.addMetric('successfullyLoaded', MetricUnit.Count, 1);
+  metrics.addMetric('successfulRun', MetricUnit.Count, 1);
 };
+
+export const handler = middy(lambdaHandler).use(logMetrics(metrics));

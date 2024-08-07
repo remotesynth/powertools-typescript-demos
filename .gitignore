@@ -2,4 +2,5 @@ node_modules
 .DS_Store
 .idea/
 lambda-output.txt
+output.txt
 *.yaml

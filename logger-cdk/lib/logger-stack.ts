@@ -9,7 +9,7 @@ export class LoggerStack extends cdk.Stack {
       entry: '../logger-lambda/index.ts',
       handler: 'handler',
       environment: {
-        Powertools_SERVICE_NAME: 'helloWorld',
+        POWERTOOLS_SERVICE_NAME: 'helloWorld',
         LOG_LEVEL: 'INFO',
       },
       logRetention: RetentionDays.ONE_WEEK,
