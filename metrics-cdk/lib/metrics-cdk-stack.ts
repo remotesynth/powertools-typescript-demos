@@ -1,7 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 
 export class MetricsCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -14,11 +13,6 @@ export class MetricsCdkStack extends cdk.Stack {
         POWERTOOLS_SERVICE_NAME: 'helloWorld',
         POWERTOOLS_METRICS_NAMESPACE: 'localstackDemo',
       },
-    });
-
-    const metric = new cloudwatch.Metric({
-      namespace: 'localstackDemo',
-      metricName: 'successfulRun'
     });
 
     new cdk.CfnOutput(this, 'MetricsFunction', {

@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@aws-lambda-powertools/idempotency": "^2.7.0",
+    "@aws-sdk/client-dynamodb": "^3.624.0",
+    "@aws-sdk/lib-dynamodb": "^3.624.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.143",
+    "@types/node": "^22.1.0"
+  }
+}
