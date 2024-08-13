@@ -5,8 +5,15 @@ install:        ## Install dependencies
 	which awslocal || pip install awscli-local[ver1]
 	which cdklocal || npm install -g aws-cdk-local aws-cdk
 	cd tracer-lambda && npm install
+	cd tracer-cdk && npm install
 	cd logger-lambda && npm install
-	cd cdk && npm install
+	cd logger-cdk && npm install
+	cd metrics-lambda && npm install
+	cd metrics-cdk && npm install
+	cd idempotency-lambda && npm install
+	cd idempotency-cdk && npm install
+	cd parameters-lambda && npm install
+	cd parameters-cdk && npm install
 
 deploy-logger:         ## Deploy the app to LocalStack
 	cd logger-cdk && \
@@ -18,26 +25,47 @@ deploy-tracer:         ## Deploy the app to LocalStack
 	    cdklocal bootstrap && \
 	    cdklocal deploy --require-approval=never
 
-deploy-cfn:     ## Deploy the generated CFn file to LocalStack
-	awslocal cloudformation create-stack --stack-name test-stack --template-body file://./cdk/template.transformed.yaml
+deploy-metrics:         ## Deploy the app to LocalStack
+	cd metrics-cdk && \
+	    cdklocal bootstrap && \
+	    cdklocal deploy --require-approval=never
 
-create-cfn-logger:     ## Create the self-contained CFn template for the logger function
-	make synth
-    # TODO: names below still need to be replaced / properly extracted by the script:
-	utils/transform_template.py cdk/template.yaml loggerFunction1A496B16 cdk/cdk.out/.cache/3a099217b2db5213dc14e303b9b7c3b4a37b943738c18efd2129c8fc260dedc5.zip
+deploy-idempotency:         ## Deploy the app to LocalStack
+	cd idempotency-cdk && \
+	    cdklocal bootstrap && \
+	    cdklocal deploy --require-approval=never
+
+deploy-parameters:         ## Deploy the app to LocalStack
+	cd parameters-cdk && \
+	    cdklocal bootstrap && \
+	    cdklocal deploy --require-approval=never
+
+invoke:
+	awslocal lambda invoke --function-name "$(LAMBDA_NAME)" output.txt
 
 invoke-logger:  ## Invoke the 'logger' sample Lambda function locally
-	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep logger) && \
+	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep Logger) && \
 	    LAMBDA_NAME=$$funcName make invoke
 
 invoke-tracer:  ## Invoke the 'tracer' sample Lambda function locally
-	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep tracer) && \
+	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep Tracer) && \
 	    LAMBDA_NAME=$$funcName make invoke
 
-invoke:
-	awslocal lambda invoke --function-name "$(LAMBDA_NAME)" lambda-output.txt
+invoke-parameters:  ## Invoke the 'parameters' sample Lambda function locally
+	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep Parameters) && \
+	    LAMBDA_NAME=$$funcName make invoke
 
-synth:          ## Create the CFn template from the CDK stack
-	cd cdk && cdklocal synth > template.yaml
+invoke-metrics:  ## Invoke the 'parameters' sample Lambda function locally
+	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep Metrics) && \
+	    LAMBDA_NAME=$$funcName make invoke
 
-.PHONY: usage install deploy invoke-logger invoke-tracer invoke synth
+invoke-idempotency:  ## Invoke the 'parameters' sample Lambda function locally
+	funcName=$$(awslocal lambda list-functions | jq -r '.Functions[].FunctionName' | grep Idempotency) && \
+		LAMBDA_NAME=$$funcName PRODUCT_ID=1 make invoke-idempotency-params && \
+		LAMBDA_NAME=$$funcName PRODUCT_ID=1 make invoke-idempotency-params && \
+		LAMBDA_NAME=$$funcName PRODUCT_ID=2 make invoke-idempotency-params
+
+invoke-idempotency-params:  ## Invoke the 'parameters' sample Lambda function locally
+	awslocal lambda invoke --function-name "$(LAMBDA_NAME)" --payload '{ "productid": "$(PRODUCT_ID)", "user": "2" }' --cli-binary-format raw-in-base64-out --invocation-type RequestResponse output.txt
+
+.PHONY: usage install deploy-logger deploy-tracer deploy-metrics deploy-parameters deploy-idempotency invoke-logger invoke-tracer invoke-metrics invoke-parameters invoke-idempotency invoke invoke-idempotency-params
